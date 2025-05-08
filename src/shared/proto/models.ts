@@ -5,33 +5,33 @@
 // source: models.proto
 
 /* eslint-disable */
-import { StringArray, StringRequest } from "./common";
+import { StringArray, StringRequest } from "./common"
 
-export const protobufPackage = "cline";
+export const protobufPackage = "cline"
 
 /** Service for model-related operations */
-export type ModelsServiceDefinition = typeof ModelsServiceDefinition;
+export type ModelsServiceDefinition = typeof ModelsServiceDefinition
 export const ModelsServiceDefinition = {
-  name: "ModelsService",
-  fullName: "cline.ModelsService",
-  methods: {
-    /** Fetches available models from Ollama */
-    getOllamaModels: {
-      name: "getOllamaModels",
-      requestType: StringRequest,
-      requestStream: false,
-      responseType: StringArray,
-      responseStream: false,
-      options: {},
-    },
-    /** Fetches available models from LM Studio */
-    getLmStudioModels: {
-      name: "getLmStudioModels",
-      requestType: StringRequest,
-      requestStream: false,
-      responseType: StringArray,
-      responseStream: false,
-      options: {},
-    },
-  },
-} as const;
+	name: "ModelsService",
+	fullName: "cline.ModelsService",
+	methods: {
+		/** Fetches available models from Ollama */
+		getOllamaModels: {
+			name: "getOllamaModels",
+			requestType: StringRequest,
+			requestStream: false,
+			responseType: StringArray,
+			responseStream: false,
+			options: {},
+		},
+		/** Fetches available models from LM Studio */
+		getLmStudioModels: {
+			name: "getLmStudioModels",
+			requestType: StringRequest,
+			requestStream: false,
+			responseType: StringArray,
+			responseStream: false,
+			options: {},
+		},
+	},
+} as const

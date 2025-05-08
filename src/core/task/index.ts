@@ -3033,10 +3033,10 @@ export class Task {
 										),
 									)
 								} else {
-										// If no response, the user clicked the "Create New Task" button
-										pushToolResult(
-											formatResponse.toolResult(`The user has created a new task with the provided context.`),
-										)
+									// If no response, the user clicked the "Create New Task" button
+									pushToolResult(
+										formatResponse.toolResult(`The user has created a new task with the provided context.`),
+									)
 								}
 								await this.saveCheckpoint()
 								break

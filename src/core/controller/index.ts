@@ -1654,7 +1654,7 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 
 	async clearTask() {
 		if (this.task) {
-    // Removed telemetryService.sendCollectedEvents call
+			// Removed telemetryService.sendCollectedEvents call
 		}
 		this.task?.abortTask()
 		this.task = undefined // removes reference to it, so once promises end it will be garbage collected

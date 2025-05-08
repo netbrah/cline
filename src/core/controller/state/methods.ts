@@ -7,9 +7,7 @@ import { getLatestState } from "./getLatestState"
 import { subscribeToState } from "./subscribeToState"
 
 // Streaming methods for this service
-export const streamingMethods = [
-  "subscribeToState"
-]
+export const streamingMethods = ["subscribeToState"]
 
 // Register all state service methods
 export function registerAllMethods(): void {

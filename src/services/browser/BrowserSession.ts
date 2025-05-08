@@ -212,7 +212,6 @@ export class BrowserSession {
 			} catch (error) {
 				console.error("Failed to launch remote browser, falling back to local mode:", error)
 
-
 				await this.launchLocalBrowser()
 			}
 		} else {
@@ -314,8 +313,6 @@ export class BrowserSession {
 				return
 			} catch (error) {
 				console.log(`Failed to connect to remote browser: ${error}`)
-
-
 			}
 		}
 
@@ -424,7 +421,6 @@ export class BrowserSession {
 
 			if (!(err instanceof TimeoutError)) {
 				logs.push(`[Error] ${errorMessage}`)
-
 			}
 		}
 
