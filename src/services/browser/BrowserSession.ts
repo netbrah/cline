@@ -15,7 +15,6 @@ import { BrowserSettings } from "@shared/BrowserSettings"
 import { discoverChromeInstances, testBrowserConnection, isPortOpen } from "./BrowserDiscovery"
 import * as chromeLauncher from "chrome-launcher"
 import { Controller } from "@core/controller"
-import { telemetryService } from "@/services/posthog/telemetry/TelemetryService"
 
 interface PCRStats {
 	puppeteer: { launch: typeof launch }
@@ -209,27 +208,10 @@ export class BrowserSession {
 				await this.launchRemoteBrowser()
 				// Don't create a new page here, as we'll create it in launchRemoteBrowser
 
-				// Send telemetry for browser tool start
-				if (this.taskId) {
-					telemetryService.captureBrowserToolStart(this.taskId, this.browserSettings)
-				}
-
 				return
 			} catch (error) {
 				console.error("Failed to launch remote browser, falling back to local mode:", error)
 
-				// Capture error telemetry
-				if (this.taskId) {
-					telemetryService.captureBrowserError(
-						this.taskId,
-						"remote_browser_launch_error",
-						error instanceof Error ? error.message : String(error),
-						{
-							isRemote: true,
-							remoteBrowserHost: this.browserSettings.remoteBrowserHost,
-						},
-					)
-				}
 
 				await this.launchLocalBrowser()
 			}
@@ -241,9 +223,6 @@ export class BrowserSession {
 		this.page = await this.browser?.newPage()
 
 		// Send telemetry for browser tool start
-		if (this.taskId) {
-			telemetryService.captureBrowserToolStart(this.taskId, this.browserSettings)
-		}
 	}
 
 	async launchLocalBrowser() {
@@ -297,19 +276,6 @@ export class BrowserSession {
 			} catch (error) {
 				console.log(`Failed to connect using cached endpoint: ${error}`)
 
-				// Capture error telemetry
-				if (this.taskId) {
-					telemetryService.captureBrowserError(
-						this.taskId,
-						"cached_endpoint_connection_error",
-						error instanceof Error ? error.message : String(error),
-						{
-							isRemote: true,
-							endpoint: browserWSEndpoint,
-						},
-					)
-				}
-
 				// Clear the cached endpoint since it's no longer valid
 				this.cachedWebSocketEndpoint = undefined
 				// User wants to give up after one reconnection attempt
@@ -349,18 +315,7 @@ export class BrowserSession {
 			} catch (error) {
 				console.log(`Failed to connect to remote browser: ${error}`)
 
-				// Capture error telemetry
-				if (this.taskId) {
-					telemetryService.captureBrowserError(
-						this.taskId,
-						"remote_host_connection_error",
-						error instanceof Error ? error.message : String(error),
-						{
-							isRemote: true,
-							remoteBrowserHost,
-						},
-					)
-				}
+
 			}
 		}
 
@@ -407,14 +362,6 @@ export class BrowserSession {
 	async closeBrowser(): Promise<BrowserActionResult> {
 		if (this.browser || this.page) {
 			// Send telemetry for browser tool end if we have a task ID and session was started
-			if (this.taskId && this.sessionStartTime > 0) {
-				const sessionDuration = Date.now() - this.sessionStartTime
-				telemetryService.captureBrowserToolEnd(this.taskId, {
-					actionCount: this.browserActions.length,
-					duration: sessionDuration,
-					actions: this.browserActions,
-				})
-			}
 
 			if (this.isConnectedToRemote && this.browser) {
 				// Close the page/tab first if it exists
@@ -478,13 +425,6 @@ export class BrowserSession {
 			if (!(err instanceof TimeoutError)) {
 				logs.push(`[Error] ${errorMessage}`)
 
-				// Capture error telemetry
-				if (this.taskId) {
-					telemetryService.captureBrowserError(this.taskId, "browser_action_error", errorMessage, {
-						isRemote: this.isConnectedToRemote,
-						action: this.browserActions[this.browserActions.length - 1],
-					})
-				}
 			}
 		}
 
@@ -522,12 +462,6 @@ export class BrowserSession {
 
 		if (!screenshotBase64) {
 			// Capture error telemetry
-			if (this.taskId) {
-				telemetryService.captureBrowserError(this.taskId, "screenshot_error", "Failed to take screenshot", {
-					isRemote: this.isConnectedToRemote,
-					action: this.browserActions[this.browserActions.length - 1],
-				})
-			}
 			throw new Error("Failed to take screenshot.")
 		}
 

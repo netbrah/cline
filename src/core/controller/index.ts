@@ -20,7 +20,6 @@ import { ClineAccountService } from "@services/account/ClineAccountService"
 import { BrowserSession } from "@services/browser/BrowserSession"
 import { McpHub } from "@services/mcp/McpHub"
 import { searchWorkspaceFiles } from "@services/search/file-search"
-import { telemetryService } from "@/services/posthog/telemetry/TelemetryService"
 import { ApiProvider, ModelInfo } from "@shared/api"
 import { ChatContent } from "@shared/ChatContent"
 import { ChatSettings } from "@shared/ChatSettings"
@@ -246,13 +245,6 @@ export class Controller {
 						}
 					}
 				})
-
-				// If user already opted in to telemetry, enable telemetry service
-				this.getStateToPostToWebview().then((state) => {
-					const { telemetrySetting } = state
-					const isOptedIn = telemetrySetting === "enabled"
-					telemetryService.updateTelemetryState(isOptedIn)
-				})
 				break
 			case "showChatView": {
 				this.postMessageToWebview({
@@ -409,11 +401,6 @@ export class Controller {
 				await this.silentlyRefreshMcpMarketplace()
 				break
 			}
-			case "taskFeedback":
-				if (message.feedbackType && this.task?.taskId) {
-					telemetryService.captureTaskFeedback(this.task.taskId, message.feedbackType)
-				}
-				break
 			// case "openMcpMarketplaceServerDetails": {
 			// 	if (message.text) {
 			// 		const response = await fetch(`https://api.cline.bot/v1/mcp/marketplace/item?mcpId=${message.mcpId}`)
@@ -568,13 +555,6 @@ export class Controller {
 				})
 				break
 			}
-			case "telemetrySetting": {
-				if (message.telemetrySetting) {
-					await this.updateTelemetrySetting(message.telemetrySetting)
-				}
-				await this.postStateToWebview()
-				break
-			}
 			case "updateSettings": {
 				// api config
 				if (message.apiConfiguration) {
@@ -586,11 +566,6 @@ export class Controller {
 
 				// custom instructions
 				await this.updateCustomInstructions(message.customInstructionsSetting)
-
-				// telemetry setting
-				if (message.telemetrySetting) {
-					await this.updateTelemetrySetting(message.telemetrySetting)
-				}
 
 				// plan act setting
 				await updateGlobalState(this.context, "planActSeparateModelsSetting", message.planActSeparateModelsSetting)
@@ -628,8 +603,6 @@ export class Controller {
 					await updateGlobalState(this.context, "favoritedModelIds", updatedFavorites)
 
 					// Capture telemetry for model favorite toggle
-					const isFavorited = !favoritedModelIds.includes(message.modelId)
-					telemetryService.captureModelFavoritesUsage(message.modelId, isFavorited)
 
 					// Post state to webview without changing any other configuration
 					await this.postStateToWebview()
@@ -677,18 +650,10 @@ export class Controller {
 		}
 	}
 
-	async updateTelemetrySetting(telemetrySetting: TelemetrySetting) {
-		await updateGlobalState(this.context, "telemetrySetting", telemetrySetting)
-		const isOptedIn = telemetrySetting === "enabled"
-		telemetryService.updateTelemetryState(isOptedIn)
-	}
-
 	async togglePlanActModeWithChatSettings(chatSettings: ChatSettings, chatContent?: ChatContent) {
 		const didSwitchToActMode = chatSettings.mode === "act"
 
 		// Capture mode switch telemetry | Capture regardless of if we know the taskId
-		telemetryService.captureModeSwitch(this.task?.taskId ?? "0", chatSettings.mode)
-
 		// Get previous model info that we will revert to after saving current mode api info
 		const {
 			apiConfiguration,
@@ -1689,7 +1654,7 @@ Here is the project's README to help you get started:\n\n${mcpDetails.readmeCont
 
 	async clearTask() {
 		if (this.task) {
-			await telemetryService.sendCollectedEvents(this.task.taskId)
+    // Removed telemetryService.sendCollectedEvents call
 		}
 		this.task?.abortTask()
 		this.task = undefined // removes reference to it, so once promises end it will be garbage collected

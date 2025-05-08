@@ -4,7 +4,6 @@ import * as path from "path"
 import simpleGit, { SimpleGit } from "simple-git"
 import { fileExistsAtPath } from "@utils/fs"
 import { getLfsPatterns, writeExcludesFile } from "./CheckpointExclusions"
-import { telemetryService } from "@/services/posthog/telemetry/TelemetryService"
 
 interface CheckpointAddResult {
 	success: boolean
@@ -100,7 +99,6 @@ export class GitOperations {
 		await git.commit("initial commit", { "--allow-empty": null })
 
 		const durationMs = Math.round(performance.now() - startTime)
-		telemetryService.captureCheckpointUsage(taskId, "shadow_git_initialized", durationMs)
 
 		console.warn(`Shadow git initialization completed`)
 

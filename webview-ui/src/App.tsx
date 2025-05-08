@@ -57,7 +57,7 @@ const AppContent = () => {
 							setShowSettings(false)
 							setShowHistory(false)
 							closeMcpView()
-							setShowAccount(true)
+							setShowAccount(false)
 							break
 						case "chatButtonClicked":
 							setShowSettings(false)

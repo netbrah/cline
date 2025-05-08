@@ -83,11 +83,11 @@ const SettingsView = ({ onDone }: SettingsViewProps) => {
 
 	// validate as soon as the component is mounted
 	/*
-	useEffect will use stale values of variables if they are not included in the dependency array. 
-	so trying to use useEffect with a dependency array of only one value for example will use any 
-	other variables' old values. In most cases you don't want this, and should opt to use react-use 
+	useEffect will use stale values of variables if they are not included in the dependency array.
+	so trying to use useEffect with a dependency array of only one value for example will use any
+	other variables' old values. In most cases you don't want this, and should opt to use react-use
 	hooks.
-    
+
 		// uses someVar and anotherVar
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [someVar])
@@ -222,15 +222,6 @@ const SettingsView = ({ onDone }: SettingsViewProps) => {
 				</div>
 
 				<div className="mb-[5px]">
-					<VSCodeCheckbox
-						className="mb-[5px]"
-						checked={telemetrySetting === "enabled"}
-						onChange={(e: any) => {
-							const checked = e.target.checked === true
-							setTelemetrySetting(checked ? "enabled" : "disabled")
-						}}>
-						Allow anonymous error and usage reporting
-					</VSCodeCheckbox>
 					<p className="text-xs mt-[5px] text-[var(--vscode-descriptionForeground)]">
 						Help improve Cline by sending anonymous usage data and error reports. No code, prompts, or personal
 						information are ever sent. See our{" "}
